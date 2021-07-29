@@ -1,0 +1,48 @@
+version: '3.2'
+
+services:
+ sonarqube:
+  image: sonarqube:lts
+  expose:
+   - 9000
+  ports:
+   - "9000:9000"
+  networks:
+   - sonarnet
+  environment:
+   - SONARQUBE_JDBC_USERNAME=sonar
+   - SONARQUBE_JDBC_PASSWORD=sonar
+   - sonar.jdbc.url=jdbc:postgresql://db/sonar
+
+  volumes:
+   - type: bind
+    source: ./myson/sonarqube/conf
+    target: /opt/sonarqube/conf
+   - type: bind
+    source: ./myson/sonarqube/plugins
+    target: /opt/sonarqube/plugins
+  ulimits:
+     nofile:
+       soft: 524288
+       hard: 524288
+  restart: always
+
+ db:
+  image: postgres
+  networks:
+   - sonarnet
+  environment:
+   - POSTGRES_USER=sonar
+   - POSTGRES_PASSWORD=sonar
+  volumes:
+   - type: bind
+    source: ./myson/postgresql
+    target: /var/lib/postgresql
+
+networks:
+ sonarnet:
+  driver: bridge
+
+volumes:
+ myson:
+
